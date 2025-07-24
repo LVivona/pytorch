@@ -17,6 +17,7 @@ from torch.distributed.tensor import (
     DeviceMesh,
     distribute_tensor,
     DTensor,
+    init_device_mesh,
     Placement,
     Replicate,
     Shard,
@@ -351,7 +352,7 @@ class DTensorTestBase(MultiProcessTestCase):
         return backend
 
     def build_device_mesh(self) -> DeviceMesh:
-        return DeviceMesh(self.device_type, list(range(self.world_size)))
+        return init_device_mesh(self.device_type, (self.world_size,))
 
     def init_pg(self, eager_init) -> None:
         if "nccl" in self.backend:
@@ -482,7 +483,7 @@ class DTensorOpTestBase(MultiThreadedTestCase):
         return DEVICE_TYPE
 
     def build_device_mesh(self):
-        return DeviceMesh(self.device_type, list(range(self.world_size)))
+        return init_device_mesh(self.device_type, (self.world_size,))
 
     def setUp(self) -> None:
         super().setUp()
