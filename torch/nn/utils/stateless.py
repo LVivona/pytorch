@@ -103,15 +103,17 @@ def _reparametrize_module(
     strict: bool = False,
     stack_weights: bool = False,
 ):
-    parameters_and_buffers = parameters_and_buffers
+    parameters_and_buffers_only = {
+        k: v for k, v in parameters_and_buffers.items() if isinstance(v, Tensor)
+    }
     stack_weights = stack_weights
 
     if tie_weights:
         untied_parameters_and_buffers = _untie_named_tensors_map(
-            module, parameters_and_buffers
+            module, parameters_and_buffers_only
         )
     else:
-        untied_parameters_and_buffers = parameters_and_buffers
+        untied_parameters_and_buffers = parameters_and_buffers_only
 
     accessor = NamedMemberAccessor(module)
     if strict:

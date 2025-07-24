@@ -57,6 +57,7 @@ placeholder_prefixes = {
     InputKind.CONSTANT_TENSOR: "c_",
     InputKind.CUSTOM_OBJ: "obj_",
     InputKind.TOKEN: "token",
+    InputKind.SYMBOLIC_ATTR: "s_",
 }
 
 _DISABLE_ATEN_TO_ASSERTION_PASS = False
@@ -88,7 +89,8 @@ def _collect_and_set_constant_attrs(
         # remove as buffer, reassign as constant/non-persistent buffer
         _mod._buffers.pop(attr, None)
         setattr(_mod, attr, value)
-        constant_attrs.add(value, name)
+        if not isinstance(value, torch.SymInt):
+            constant_attrs.add(value, name)
     return constant_attrs
 
 
