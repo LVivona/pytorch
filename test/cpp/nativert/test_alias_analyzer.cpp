@@ -44,7 +44,7 @@ class AliasAnalyzerTests : public testing::Test {
 
     auto graph = stringToGraph(model);
     auto kernels = KernelFactory().initializeNodeKernels(
-        *graph, nullptr, cfg, {}, nullptr);
+        *graph, nullptr, cfg, nullptr);
     auto kernelSchemas = Executor::getKernelSchemas(kernels.nodeKernels);
 
     AliasAnalyzer analyzer(*graph, kernelSchemas);
