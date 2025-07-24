@@ -435,6 +435,7 @@ AOTITorchError aoti_torch_empty_strided(
     int32_t dtype,
     int32_t device_type,
     int32_t device_index,
+    bool is_pinned,
     AtenTensorHandle* ret_new_tensor) {
   AOTI_TORCH_CONVERT_EXCEPTION_TO_ERROR_CODE({
     c10::IntArrayRef sizes(sizes_ptr, ndim);
@@ -443,12 +444,35 @@ AOTITorchError aoti_torch_empty_strided(
       *ret_new_tensor = new_tensor_handle(at::detail::empty_strided_cpu(
           sizes, strides, static_cast<c10::ScalarType>(dtype)));
     } else {
+      TORCH_CHECK(is_pinned == false, "only CPU tensors can be pinned");
       c10::Device device = c10_device(device_type, device_index);
       c10::TensorOptions options = c10::TensorOptions().device(device).dtype(
           static_cast<c10::ScalarType>(dtype));
       *ret_new_tensor =
           new_tensor_handle(at::empty_strided(sizes, strides, options));
     }
+  });
+}
+
+AOTITorchError aoti_torch_empty_strided_pinned(
+    int64_t ndim,
+    const int64_t* sizes_ptr,
+    const int64_t* strides_ptr,
+    int32_t dtype,
+    int32_t device_type,
+    int32_t device_index,
+    AtenTensorHandle* ret_new_tensor) {
+  AOTI_TORCH_CONVERT_EXCEPTION_TO_ERROR_CODE({
+    c10::IntArrayRef sizes(sizes_ptr, ndim);
+    c10::IntArrayRef strides(strides_ptr, ndim);
+    TORCH_CHECK(
+        c10::DeviceType(device_type) == c10::DeviceType::CPU,
+        "only CPU tensors can be pinned");
+    *ret_new_tensor = new_tensor_handle(at::detail::empty_strided_cpu(
+        sizes,
+        strides,
+        static_cast<c10::ScalarType>(dtype),
+        /*is_pinned=*/true));
   });
 }
 
