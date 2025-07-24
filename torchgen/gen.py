@@ -2840,6 +2840,7 @@ def main() -> None:
     aoti_backends = {
         DispatchKey.CPU,
         DispatchKey.CUDA,
+        DispatchKey.GenericKey,
     }
 
     # TODO: stop generating CUDA kernels for non-CUDA builds
